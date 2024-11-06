@@ -69,6 +69,12 @@ impl<'a> Execute<'a> {
         self.context_builder.max_cycles(max_cycles);
         self
     }
+
+    /// Set whether to skip deferred proof verification.
+    pub fn skip_deferred_proof_verification(mut self) -> Self {
+        self.context_builder.skip_deferred_proof_verification(true);
+        self
+    }
 }
 
 /// Builder to prepare and configure proving execution of a program on an input.

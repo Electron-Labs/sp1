@@ -353,6 +353,7 @@ mod tests {
         let mut stdin = SP1Stdin::new();
         stdin.write(&10usize);
         client.execute(elf, stdin).max_cycles(1).run().unwrap();
+        client.execute(elf, stdin).skip_deferred_proof_verification().run().unwrap();
     }
 
     #[test]
