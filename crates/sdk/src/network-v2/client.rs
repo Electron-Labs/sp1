@@ -35,6 +35,7 @@ pub struct NetworkClient {
     signer: PrivateKeySigner,
     http: HttpClientWithMiddleware,
     s3: OnceCell<S3Client>,
+    skip_simulation: bool,
 }
 
 impl NetworkClient {
@@ -48,7 +49,12 @@ impl NetworkClient {
             .build()
             .unwrap();
 
-        Self { signer, http: http_client.into(), s3: OnceCell::new() }
+        Self { signer, http: http_client.into(), s3: OnceCell::new(), skip_simulation: false }
+    }
+
+    /// Skip simulation for proof requests.
+    pub fn skip_simulation(&mut self) {
+        self.skip_simulation = true;
     }
 
     /// Returns the currently configured RPC endpoint for the Succinct prover network.

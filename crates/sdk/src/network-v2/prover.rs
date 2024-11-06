@@ -56,8 +56,7 @@ impl NetworkProver {
         timeout: Option<Duration>,
     ) -> Result<Vec<u8>> {
         // Simulate and get the cycle limit.
-        let skip_simulation = env::var("SKIP_SIMULATION").map(|val| val == "true").unwrap_or(false);
-        let cycle_limit = if !skip_simulation {
+        let cycle_limit = if !self.client.skip_simulation {
             let (_, report) =
                 self.local_prover.sp1_prover().execute(elf, &stdin, Default::default())?;
             let cycles = report.total_instruction_count();

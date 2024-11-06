@@ -54,9 +54,7 @@ impl NetworkProver {
     ) -> Result<String> {
         let client = &self.client;
 
-        let skip_simulation = env::var("SKIP_SIMULATION").map(|val| val == "true").unwrap_or(false);
-
-        if !skip_simulation {
+        if !client.skip_simulation {
             let (_, report) =
                 self.local_prover.sp1_prover().execute(elf, &stdin, Default::default())?;
             log::info!("Simulation complete, cycles: {}", report.total_instruction_count());
