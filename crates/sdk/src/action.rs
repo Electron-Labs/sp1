@@ -72,7 +72,7 @@ impl<'a> Execute<'a> {
 
     /// Set whether to skip deferred proof verification.
     pub fn set_skip_deferred_proof_verification(mut self, value: bool) -> Self {
-        self.context_builder.skip_deferred_proof_verification(value);
+        self.context_builder.set_skip_deferred_proof_verification(value);
         self
     }
 }
