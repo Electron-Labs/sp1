@@ -28,6 +28,7 @@ const DEFAULT_CYCLE_LIMIT: u64 = 1_000_000_000;
 pub struct NetworkProver {
     client: NetworkClient,
     local_prover: CpuProver,
+    skip_simulation: bool,
 }
 
 impl NetworkProver {
@@ -38,13 +39,18 @@ impl NetworkProver {
         Self::new_from_key(&private_key)
     }
 
+    /// Skip simulation when running `prove`.
+    pub fn skip_simulation(&mut self) {
+        self.skip_simulation = true;
+    }
+
     /// Creates a new [NetworkProver] with the given private key.
     pub fn new_from_key(private_key: &str) -> Self {
         let version = SP1_CIRCUIT_VERSION;
         log::info!("Client circuit version: {}", version);
         let local_prover = CpuProver::new();
         let client = NetworkClient::new(private_key);
-        Self { client, local_prover }
+        Self { client, local_prover, skip_simulation: false }
     }
 
     /// Requests a proof from the prover network, returning the request ID.
@@ -56,7 +62,7 @@ impl NetworkProver {
         timeout: Option<Duration>,
     ) -> Result<Vec<u8>> {
         // Simulate and get the cycle limit.
-        let cycle_limit = if !self.client.skip_simulation {
+        let cycle_limit = if !self.skip_simulation {
             let (_, report) =
                 self.local_prover.sp1_prover().execute(elf, &stdin, Default::default())?;
             let cycles = report.total_instruction_count();

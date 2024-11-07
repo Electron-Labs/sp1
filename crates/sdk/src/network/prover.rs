@@ -26,6 +26,7 @@ const MAX_CONSECUTIVE_ERRORS: usize = 10;
 pub struct NetworkProver {
     client: NetworkClient,
     local_prover: CpuProver,
+    skip_simulation: bool,
 }
 
 impl NetworkProver {
@@ -42,7 +43,12 @@ impl NetworkProver {
         log::info!("Client circuit version: {}", version);
 
         let local_prover = CpuProver::new();
-        Self { client: NetworkClient::new(private_key), local_prover }
+        Self { client: NetworkClient::new(private_key), local_prover, skip_simulation: false }
+    }
+
+    /// Skip simulation when running `prove`.
+    pub fn skip_simulation(&mut self) {
+        self.skip_simulation = true;
     }
 
     /// Requests a proof from the prover network, returning the proof ID.
@@ -52,9 +58,7 @@ impl NetworkProver {
         stdin: SP1Stdin,
         mode: ProofMode,
     ) -> Result<String> {
-        let client = &self.client;
-
-        if !client.skip_simulation {
+        if !self.skip_simulation {
             let (_, report) =
                 self.local_prover.sp1_prover().execute(elf, &stdin, Default::default())?;
             log::info!("Simulation complete, cycles: {}", report.total_instruction_count());

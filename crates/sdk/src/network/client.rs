@@ -40,7 +40,6 @@ pub struct NetworkClient {
     pub rpc: TwirpClient,
     pub http: HttpClientWithMiddleware,
     pub auth: NetworkAuth,
-    pub skip_simulation: bool,
 }
 
 impl NetworkClient {
@@ -71,12 +70,7 @@ impl NetworkClient {
             .build()
             .unwrap();
 
-        Self { auth, rpc, http: http_client.into(), skip_simulation: false }
-    }
-
-    /// Skip simulation for proof requests.
-    pub fn skip_simulation(&mut self) {
-        self.skip_simulation = true;
+        Self { auth, rpc, http: http_client.into() }
     }
 
     /// Gets the latest nonce for this auth's account.
