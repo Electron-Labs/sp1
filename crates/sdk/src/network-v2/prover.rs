@@ -40,8 +40,8 @@ impl NetworkProver {
     }
 
     /// Skip simulation when running `prove`.
-    pub fn skip_simulation(&mut self) {
-        self.skip_simulation = true;
+    pub fn set_skip_simulation(&mut self, skip: bool) {
+        self.skip_simulation = skip;
     }
 
     /// Creates a new [NetworkProver] with the given private key.
