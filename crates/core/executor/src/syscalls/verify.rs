@@ -33,10 +33,6 @@ impl Syscall for VerifySyscall {
         let pv_digest_bytes: [u32; 8] = pv_digest.try_into().unwrap();
 
         // Only verify deferred proofs if the runtime is not skipping deferred proof verification.
-        println!(
-            "LOG: VerifySyscall: verify deferred proof, skipping: {}",
-            ctx.rt.skip_deferred_proof_verification
-        );
         if !ctx.rt.skip_deferred_proof_verification {
             ctx.rt
                 .subproof_verifier

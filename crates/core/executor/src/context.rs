@@ -72,11 +72,13 @@ impl<'a> SP1ContextBuilder<'a> {
             });
         let subproof_verifier = take(&mut self.subproof_verifier);
         let cycle_limit = take(&mut self.max_cycles);
+        let skip_deferred_proof_verification =
+            take(&mut self.skip_deferred_proof_verification);
         SP1Context {
             hook_registry,
             subproof_verifier,
             max_cycles: cycle_limit,
-            skip_deferred_proof_verification: false,
+            skip_deferred_proof_verification,
         }
     }
 
