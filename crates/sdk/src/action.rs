@@ -129,6 +129,7 @@ impl<'a> Prove<'a> {
         } = self;
         let opts = SP1ProverOpts { core_opts, recursion_opts };
         let proof_opts = ProofOpts { sp1_prover_opts: opts, timeout };
+        context_builder.set_skip_deferred_proof_verification(skip_deferred_proof_verification);
         let context = context_builder.build();
 
         // Dump the program and stdin to files for debugging if `SP1_DUMP` is set.

@@ -310,6 +310,9 @@ impl<SC: StarkGenericConfig, A: MachineAir<Val<SC>>> StarkMachine<SC, A> {
                 if contains_global_bus {
                     challenger.observe(shard_proof.commitment.global_main_commit.clone());
                 }
+                // TODO: In mock mode, the public values of the compressed proof is vec![]
+                // This causes a panic because it's trying to index into the slice past the slice's length.
+                // What's the best way to turn off this check in the veriifer.
                 challenger.observe_slice(&shard_proof.public_values[0..self.num_pv_elts()]);
             });
         });

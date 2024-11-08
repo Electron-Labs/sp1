@@ -125,6 +125,8 @@ impl Prover<DefaultProverComponents> for MockProver {
                 })
             }
             SP1ProofKind::Groth16 => {
+                // TODO: The issue is that .prove() invokes execution in the Groth16 case, which
+                // will attempt to verify the proof according to the stdin.
                 let (public_values, _) = self.prover.execute(&pk.elf, &stdin, context)?;
                 Ok(SP1ProofWithPublicValues {
                     proof: SP1Proof::Groth16(Groth16Bn254Proof {
