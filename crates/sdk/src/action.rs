@@ -127,10 +127,18 @@ impl<'a> Prove<'a> {
             timeout,
             skip_deferred_proof_verification,
         } = self;
+        println!(
+            "Prove Run Action skip deferred proof verification: {}",
+            skip_deferred_proof_verification
+        );
         let opts = SP1ProverOpts { core_opts, recursion_opts };
         let proof_opts = ProofOpts { sp1_prover_opts: opts, timeout };
         context_builder.set_skip_deferred_proof_verification(skip_deferred_proof_verification);
         let context = context_builder.build();
+        println!(
+            "Prove Run Action context skip deferred proof verification: {:?}",
+            context.skip_deferred_proof_verification
+        );
 
         // Dump the program and stdin to files for debugging if `SP1_DUMP` is set.
         if std::env::var("SP1_DUMP")

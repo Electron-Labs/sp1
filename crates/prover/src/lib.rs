@@ -272,6 +272,10 @@ impl<C: SP1ProverComponents> SP1Prover<C> {
         stdin: &SP1Stdin,
         mut context: SP1Context<'a>,
     ) -> Result<(SP1PublicValues, ExecutionReport), ExecutionError> {
+        println!(
+            "EXECUTE LOG: skip deferred proof verification: {}",
+            context.skip_deferred_proof_verification
+        );
         context.subproof_verifier.replace(Arc::new(self));
         let program = self.get_program(elf).unwrap();
         let opts = SP1CoreOpts::default();

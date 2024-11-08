@@ -125,6 +125,10 @@ impl Prover<DefaultProverComponents> for MockProver {
                 })
             }
             SP1ProofKind::Groth16 => {
+                println!(
+                    "LOG: SP1ProofKind::Groth16 skip deferred proof verification: {}",
+                    context.skip_deferred_proof_verification
+                );
                 // TODO: The issue is that .prove() invokes execution in the Groth16 case, which
                 // will attempt to verify the proof according to the stdin.
                 let (public_values, _) = self.prover.execute(&pk.elf, &stdin, context)?;
