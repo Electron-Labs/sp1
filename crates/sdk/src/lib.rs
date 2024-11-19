@@ -51,6 +51,8 @@ pub use sp1_prover::{
 pub struct ProverClient {
     /// The underlying prover implementation.
     pub prover: Box<dyn Prover<DefaultProverComponents>>,
+    /// Whether aggregation is enabled
+    pub aggregation: bool,
 }
 
 impl ProverClient {
@@ -72,28 +74,26 @@ impl ProverClient {
     /// ```
     pub fn new() -> Self {
         #[allow(unreachable_code)]
-        match env::var("SP1_PROVER").unwrap_or("local".to_string()).to_lowercase().as_str() {
-            "mock" => Self { prover: Box::new(MockProver::new()) },
+        let prover: Box<dyn Prover<DefaultProverComponents>> = match env::var("SP1_PROVER").unwrap_or("local".to_string()).to_lowercase().as_str() {
+            "mock" => Box::new(MockProver::new()),
             "local" => {
                 #[cfg(debug_assertions)]
                 println!("Warning: Local prover in dev mode is not recommended. Proof generation may be slow.");
-                Self {
-                    #[cfg(not(feature = "cuda"))]
-                    prover: Box::new(CpuProver::new()),
-                    #[cfg(feature = "cuda")]
-                    prover: Box::new(CudaProver::new(SP1Prover::new())),
+                #[cfg(not(feature = "cuda"))]
+                {
+                    Box::new(CpuProver::new())
+                }
+                #[cfg(feature = "cuda")]
+                {
+                    Box::new(CudaProver::new(SP1Prover::new()))
                 }
             }
             "network" => {
                 cfg_if! {
                     if #[cfg(feature = "network-v2")] {
-                        Self {
-                            prover: Box::new(NetworkProverV2::new()),
-                        }
+                            Box::new(NetworkProverV2::new())
                     } else if #[cfg(feature = "network")] {
-                        Self {
-                            prover: Box::new(NetworkProverV1::new()),
-                        }
+                            Box::new(NetworkProverV1::new())
                     } else {
                         panic!("network feature is not enabled")
                     }
@@ -102,7 +102,29 @@ impl ProverClient {
             _ => panic!(
                 "invalid value for SP1_PROVER environment variable: expected 'local', 'mock', or 'network'"
             ),
+        };
+
+        Self {
+            prover,
+            aggregation: false, // Default to no aggregation.
         }
+    }
+
+    /// Sets aggregation mode for the prover client.
+    ///
+    /// This method allows the user to enable or disable proof aggregation.
+    ///
+    /// ### Examples
+    ///
+    /// ```no_run
+    /// use sp1_sdk::ProverClient;
+    ///
+    /// let mut client = ProverClient::new();
+    /// client.set_aggregation(true);
+    /// ```
+    pub fn set_aggregation(&mut self, aggregation: bool) {
+        //TODO: Add a match that client is network or else aggregation doesnt make sense
+        self.aggregation = aggregation;
     }
 
     /// Creates a new [ProverClient] with the mock prover.
@@ -118,7 +140,7 @@ impl ProverClient {
     /// let client = ProverClient::mock();
     /// ```
     pub fn mock() -> Self {
-        Self { prover: Box::new(MockProver::new()) }
+        Self { prover: Box::new(MockProver::new()), aggregation: false }
     }
 
     /// Creates a new [ProverClient] with the local prover.
@@ -134,7 +156,7 @@ impl ProverClient {
     /// let client = ProverClient::local();
     /// ```
     pub fn local() -> Self {
-        Self { prover: Box::new(CpuProver::new()) }
+        Self { prover: Box::new(CpuProver::new()), aggregation: false }
     }
 
     /// Creates a new [ProverClient] with the network prover.
@@ -154,10 +176,12 @@ impl ProverClient {
             if #[cfg(feature = "network-v2")] {
                 Self {
                     prover: Box::new(NetworkProverV2::new()),
+                    aggregation: false
                 }
             } else if #[cfg(feature = "network")] {
                 Self {
                     prover: Box::new(NetworkProverV1::new()),
+                    aggregation: false
                 }
             } else {
                 panic!("network feature is not enabled")
@@ -223,7 +247,14 @@ impl ProverClient {
     /// let proof = client.prove(&pk, stdin).run().unwrap();
     /// ```
     pub fn prove<'a>(&'a self, pk: &'a SP1ProvingKey, stdin: SP1Stdin) -> action::Prove<'a> {
-        action::Prove::new(self.prover.as_ref(), pk, stdin)
+        let mut prove_action = action::Prove::new(self.prover.as_ref(), pk, stdin);
+
+        // If aggregation is enabled, use the compressed mode.
+        if self.aggregation {
+            prove_action = prove_action.compressed();
+        }
+
+        prove_action
     }
 
     /// Verifies that the given proof is valid and matches the given verification key produced by
