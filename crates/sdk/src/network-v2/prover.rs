@@ -56,6 +56,7 @@ impl NetworkProver {
         stdin: SP1Stdin,
         mode: ProofMode,
         timeout: Option<Duration>,
+        aggregation: bool,
     ) -> Result<Vec<u8>> {
         // Simulate and get the cycle limit.
         let skip_simulation = env::var("SKIP_SIMULATION").map(|val| val == "true").unwrap_or(false);
@@ -199,8 +200,9 @@ impl NetworkProver {
         stdin: SP1Stdin,
         mode: ProofMode,
         timeout: Option<Duration>,
+        aggregation: bool,
     ) -> Result<SP1ProofWithPublicValues> {
-        let request_id = self.request_proof(elf, stdin, mode, timeout).await?;
+        let request_id = self.request_proof(elf, stdin, mode, timeout, aggregation).await?;
         self.wait_proof(&request_id, timeout).await
     }
 }
@@ -225,9 +227,10 @@ impl Prover<DefaultProverComponents> for NetworkProver {
         opts: ProofOpts,
         context: SP1Context<'a>,
         kind: SP1ProofKind,
+        aggregation: bool,
     ) -> Result<SP1ProofWithPublicValues> {
         warn_if_not_default(&opts.sp1_prover_opts, &context);
-        block_on(self.prove(&pk.elf, stdin, kind.into(), opts.timeout))
+        block_on(self.prove(&pk.elf, stdin, kind.into(), opts.timeout, aggregation))
     }
 }
 

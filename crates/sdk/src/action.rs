@@ -82,6 +82,7 @@ pub struct Prove<'a> {
     core_opts: SP1CoreOpts,
     recursion_opts: SP1CoreOpts,
     timeout: Option<Duration>,
+    aggregation: bool,
 }
 
 impl<'a> Prove<'a> {
@@ -93,16 +94,18 @@ impl<'a> Prove<'a> {
         prover: &'a dyn Prover<DefaultProverComponents>,
         pk: &'a SP1ProvingKey,
         stdin: SP1Stdin,
+        aggregation: bool,
     ) -> Self {
         Self {
             prover,
-            kind: Default::default(),
+            kind: if aggregation { SP1ProofKind::Compressed } else { Default::default() },
             pk,
             stdin,
             context_builder: Default::default(),
             core_opts: SP1CoreOpts::default(),
             recursion_opts: SP1CoreOpts::recursion(),
             timeout: None,
+            aggregation,
         }
     }
 
@@ -117,6 +120,7 @@ impl<'a> Prove<'a> {
             core_opts,
             recursion_opts,
             timeout,
+            aggregation,
         } = self;
         let opts = SP1ProverOpts { core_opts, recursion_opts };
         let proof_opts = ProofOpts { sp1_prover_opts: opts, timeout };
@@ -133,7 +137,7 @@ impl<'a> Prove<'a> {
             std::fs::write("stdin.bin", stdin.clone()).unwrap();
         }
 
-        prover.prove(pk, stdin, proof_opts, context, kind)
+        prover.prove(pk, stdin, proof_opts, context, kind, aggregation)
     }
 
     /// Set the proof kind to the core mode. This is the default.

@@ -143,6 +143,7 @@ impl NetworkClient {
         elf: &[u8],
         stdin: &SP1Stdin,
         mode: ProofMode,
+        aggregation: bool,
         circuit_version: &str,
     ) -> Result<String> {
         let start = SystemTime::now();

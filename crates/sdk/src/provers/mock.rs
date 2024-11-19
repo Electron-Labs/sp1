@@ -53,6 +53,7 @@ impl Prover<DefaultProverComponents> for MockProver {
         opts: ProofOpts,
         context: SP1Context<'a>,
         kind: SP1ProofKind,
+        _aggregation: bool,
     ) -> Result<SP1ProofWithPublicValues> {
         match kind {
             SP1ProofKind::Core => {

@@ -51,6 +51,7 @@ impl NetworkProver {
         elf: &[u8],
         stdin: SP1Stdin,
         mode: ProofMode,
+        aggregation: bool,
     ) -> Result<String> {
         let client = &self.client;
 
@@ -64,7 +65,8 @@ impl NetworkProver {
             log::info!("Skipping simulation");
         }
 
-        let proof_id = client.create_proof(elf, &stdin, mode, SP1_CIRCUIT_VERSION).await?;
+        let proof_id =
+            client.create_proof(elf, &stdin, mode, aggregation, SP1_CIRCUIT_VERSION).await?;
         log::info!("Created {}", proof_id);
 
         if NetworkClient::rpc_url() == DEFAULT_PROVER_NETWORK_RPC {
@@ -151,8 +153,9 @@ impl NetworkProver {
         stdin: SP1Stdin,
         mode: ProofMode,
         timeout: Option<Duration>,
+        aggregation: bool,
     ) -> Result<SP1ProofWithPublicValues> {
-        let proof_id = self.request_proof(elf, stdin, mode).await?;
+        let proof_id = self.request_proof(elf, stdin, mode, aggregation).await?;
         self.wait_proof(&proof_id, timeout).await
     }
 }
@@ -177,9 +180,10 @@ impl Prover<DefaultProverComponents> for NetworkProver {
         opts: ProofOpts,
         context: SP1Context<'a>,
         kind: SP1ProofKind,
+        aggregation: bool,
     ) -> Result<SP1ProofWithPublicValues> {
         warn_if_not_default(&opts.sp1_prover_opts, &context);
-        block_on(self.prove(&pk.elf, stdin, kind.into(), opts.timeout))
+        block_on(self.prove(&pk.elf, stdin, kind.into(), opts.timeout, aggregation))
     }
 }
 

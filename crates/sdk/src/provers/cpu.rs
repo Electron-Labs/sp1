@@ -49,6 +49,7 @@ impl Prover<DefaultProverComponents> for CpuProver {
         opts: ProofOpts,
         context: SP1Context<'a>,
         kind: SP1ProofKind,
+        _aggregation: bool,
     ) -> Result<SP1ProofWithPublicValues> {
         // Generate the core proof.
         let proof: sp1_prover::SP1ProofWithMetadata<sp1_prover::SP1CoreProofData> =

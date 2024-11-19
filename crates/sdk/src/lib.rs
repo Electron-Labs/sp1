@@ -247,13 +247,7 @@ impl ProverClient {
     /// let proof = client.prove(&pk, stdin).run().unwrap();
     /// ```
     pub fn prove<'a>(&'a self, pk: &'a SP1ProvingKey, stdin: SP1Stdin) -> action::Prove<'a> {
-        let mut prove_action = action::Prove::new(self.prover.as_ref(), pk, stdin);
-
-        // If aggregation is enabled, use the compressed mode.
-        if self.aggregation {
-            prove_action = prove_action.compressed();
-        }
-
+        let prove_action = action::Prove::new(self.prover.as_ref(), pk, stdin, self.aggregation);
         prove_action
     }
 

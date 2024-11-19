@@ -81,6 +81,7 @@ pub trait Prover<C: SP1ProverComponents>: Send + Sync {
         opts: ProofOpts,
         context: SP1Context<'a>,
         kind: SP1ProofKind,
+        aggregation: bool,
     ) -> Result<SP1ProofWithPublicValues>;
 
     /// Verify that an SP1 proof is valid given its vkey and metadata.
