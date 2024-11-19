@@ -20,6 +20,7 @@ pub use crate::network_v2::prover::NetworkProver as NetworkProverV2;
 #[cfg(feature = "cuda")]
 pub use crate::provers::CudaProver;
 
+pub mod aggregation;
 pub mod proof;
 pub mod provers;
 pub mod utils {
@@ -123,7 +124,6 @@ impl ProverClient {
     /// client.set_aggregation(true);
     /// ```
     pub fn set_aggregation(&mut self, aggregation: bool) {
-        //TODO: Add a match that client is network or else aggregation doesnt make sense
         self.aggregation = aggregation;
     }
 

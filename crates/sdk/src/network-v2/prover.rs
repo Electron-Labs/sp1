@@ -56,7 +56,7 @@ impl NetworkProver {
         stdin: SP1Stdin,
         mode: ProofMode,
         timeout: Option<Duration>,
-        aggregation: bool,
+        _aggregation: bool,
     ) -> Result<Vec<u8>> {
         // Simulate and get the cycle limit.
         let skip_simulation = env::var("SKIP_SIMULATION").map(|val| val == "true").unwrap_or(false);

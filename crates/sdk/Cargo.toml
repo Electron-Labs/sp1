@@ -12,6 +12,7 @@ categories = { workspace = true }
 [dependencies]
 prost = { version = "0.13", optional = true }
 serde = { workspace = true, features = ["derive"] }
+serde_json = "1.0.132"
 twirp = { package = "twirp-rs", version = "0.13.0-succinct", optional = true }
 async-trait = "0.1.81"
 reqwest-middleware = { version = "0.3.2", optional = true }
@@ -19,6 +20,7 @@ reqwest = { version = "0.12.4", default-features = false, features = [
   "rustls-tls",
   "trust-dns",
   "stream",
+  "json"
 ], optional = true }
 anyhow = "1.0.83"
 sp1-prover = { workspace = true }

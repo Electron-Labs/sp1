@@ -2,6 +2,7 @@ use crate::types::Buffer;
 use num_bigint::BigUint;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use sha2::{Digest, Sha256};
+use tiny_keccak::{Hasher, Keccak};
 
 /// Public values for the prover.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -57,6 +58,15 @@ impl SP1PublicValues {
         let mut hasher = Sha256::new();
         hasher.update(self.buffer.data.as_slice());
         hasher.finalize().to_vec()
+    }
+
+    /// Keccak Hash the public values.
+    pub fn hash_keccak(&self) -> [u8; 32] {
+        let mut hasher = Keccak::v256();
+        hasher.update(self.buffer.data.as_slice());
+        let mut output = [0u8; 32];
+        hasher.finalize(&mut output);
+        output
     }
 
     /// Hash the public values, mask the top 3 bits and return a BigUint. Matches the implementation
